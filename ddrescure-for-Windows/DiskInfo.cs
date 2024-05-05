@@ -1,4 +1,4 @@
-﻿namespace ddrescure_for_Windows
+﻿namespace ddrescue_for_Windows
 {
     internal class DiskInfo
     {

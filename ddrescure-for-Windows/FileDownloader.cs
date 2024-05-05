@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net.Http;
 
-namespace ddrescure_for_Windows
+namespace ddrescue_for_Windows
 {
     public class FileDownloader
     {

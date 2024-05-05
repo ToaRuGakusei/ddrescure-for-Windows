@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Path = System.IO.Path;
 
-namespace ddrescure_for_Windows
+namespace ddrescue_for_Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -16,8 +16,11 @@ namespace ddrescure_for_Windows
         public MainWindow()
         {
             InitializeComponent();
-            /*FirstSetup firstSetup = new FirstSetup();
-            firstSetup.Show();*/
+            if (!File.Exists(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe"))
+            {
+                FirstSetup firstSetup = new FirstSetup();
+                firstSetup.ShowDialog();
+            }
         }
         private string imagePath = "";
         private async Task<ObservableCollection<DiskInfo>> getPar()
@@ -103,66 +106,121 @@ namespace ddrescure_for_Windows
 
             return list;
         }
+        private bool cancel = false;
         private async void ddrescueRun(string option)
         {
-            await Task.Run(() =>
+            try
             {
-                ProcessStartInfo si = new ProcessStartInfo(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe", $"{option}");
-                // ウィンドウ表示を完全に消したい場合
-                si.CreateNoWindow = false;
-                si.RedirectStandardError = false;
-                si.RedirectStandardOutput = true;
-                si.UseShellExecute = false;
-                using (var proc = new Process())
-                using (var ctoken = new CancellationTokenSource())
+                await Task.Run(() =>
                 {
-
-                    proc.EnableRaisingEvents = true;
-                    proc.StartInfo = si;
-                    // コールバックの設定
-                    proc.Exited += (s, ev) =>
+                    ProcessStartInfo si = new ProcessStartInfo(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe", $"{option}");
+                    // ウィンドウ表示を完全に消したい場合
+                    si.CreateNoWindow = true;
+                    si.RedirectStandardError = false;
+                    si.RedirectStandardOutput = true;
+                    si.UseShellExecute = false;
+                    string dir = Path.GetDirectoryName(imagePath);
+                    DateTime dateTime = DateTime.Now;
+                    using (var proc = new Process())
+                    using (var ctoken = new CancellationTokenSource())
                     {
-                        Console.WriteLine($"exited");
-                        this.Dispatcher.Invoke((Action)(() =>
+
+                        proc.EnableRaisingEvents = true;
+                        proc.StartInfo = si;
+                        // コールバックの設定
+                        proc.Exited += (s, ev) =>
                         {
-
-
-                        }));
-                        // プロセスが終了すると呼ばれる
-                        ctoken.Cancel();
-                    };
-                    // プロセスの開始
-                    proc.Start();
-                    Task.WaitAll(
-                        Task.Run(async () =>
-                        {
-                            int count = 0;
-                            string[] buf = new string[6];
-
-                            while (true)
+                            Console.WriteLine($"exited");
+                            this.Dispatcher.Invoke((Action)(() =>
                             {
-                                var l = await proc.StandardOutput.ReadLineAsync();
-                                Debug.WriteLine(l);
-                                count++;
-                                this.Dispatcher.Invoke((Action)(async () =>
-                                {
-                                    Prompt.Content += l + "\n";
+                                this.IsEnabled = true;
 
-                                }));
-                                if (l == null)
+                            }));
+                            // プロセスが終了すると呼ばれる
+                            ctoken.Cancel();
+                        };
+                        // プロセスの開始
+                        proc.Start();
+                        int count = 0;
+                        bool syokika = false;
+                        Task.WaitAll(
+                            Task.Run(async () =>
+                            {
+                                int count = 0;
+                                ObservableCollection<string> buf = new ObservableCollection<string>();
+                                while (true)
                                 {
-                                    break;
+                                    string l = proc.StandardOutput.ReadLine();
+                                    buf.Add(l);
+                                    if(buf.Count == 8 && !syokika)
+                                    {
+                                        buf.Clear();
+                                        syokika = true;
+                                    }else if(syokika)
+                                    {
+                                        if (buf.Count == 8)
+                                        {
+
+                                                string a = "";
+                                                this.Dispatcher.Invoke((Action)(async () =>
+                                                {
+                                                    foreach (string s in buf)
+                                                    {
+                                                        a += s + "\n";
+                                                    }
+                                                    Prompt.Content = a;
+                                                    Title = "Running!!";
+                                                }));
+                                                buf.Clear();
+                                                a = "";
+                                                count = 0;
+                                            
+                                            
+                                        }
+                                        else if (buf.Count >= 10)
+                                        {
+                                            buf.Clear();
+                                        }
+                                    }
+                                    
+
+                                    Debug.WriteLine(l);
+                                    count++;
+                                    if (l.Contains("Finished"))
+                                    {
+                                        this.Dispatcher.Invoke((Action)(async () =>
+                                        {
+                                            run.Content = "実行";
+                                            cancel = true;
+                                            image.IsEnabled = true;
+                                            DirectAccess.IsEnabled = true;
+                                            ReadErrorIgnore.IsEnabled = true;
+                                            kuwashiku.IsEnabled = true;
+                                        }));
+                                    }
+
+                                    if (l == null || cancel == true)
+                                    {
+                                        proc.Kill();
+                                        cancel = false;
+                                        break;
+                                    }
                                 }
-                            }
-                        }),
-                        Task.Run(() =>
-                        {
-                            ctoken.Token.WaitHandle.WaitOne();
-                            proc.WaitForExit();
-                        })
-                    );
-                }
-            });
+                            }),
+                            Task.Run(() =>
+                            {
+                                ctoken.Token.WaitHandle.WaitOne();
+                                proc.WaitForExit();
+                            })
+                        );
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
 
         private async void getPartition_Click(object sender, RoutedEventArgs e)
@@ -174,13 +232,19 @@ namespace ddrescure_for_Windows
         {
             if (listview.SelectedItem != null)
             {
-                before.Content = (listview.SelectedItems[0] as DiskInfo).name;
-                if (listview.SelectedItems.Count == 2)
+                if (listview.SelectedItems.Count >= 3)
                 {
-                    after.Content = (listview.SelectedItems[1] as DiskInfo).name;
+                    listview.SelectedItems.Clear();
+                }
+                else
+                {
+                    before.Content = "/dev/" + (listview.SelectedItems[0] as DiskInfo).name;
+                    if (listview.SelectedItems.Count == 2)
+                    {
+                        after.Content = "/dev/" + (listview.SelectedItems[1] as DiskInfo).name;
+                    }
                 }
             }
-
         }
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -194,7 +258,7 @@ namespace ddrescure_for_Windows
                     dlg.Filters.Add(new CommonFileDialogFilter("IMG", "*.img"));
                     if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                     {
-                        after.Content = Path.GetFileName(dlg.FileName);
+                        after.Content = dlg.FileName;
                         imagePath = dlg.FileName;
                         listview.SelectionMode = SelectionMode.Single;
                     }
@@ -229,20 +293,79 @@ namespace ddrescure_for_Windows
 
         }
         public string tmpOption = " ";
+        public string log = "";
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string moto = "/dev/" + (string)before.Content;
-            string saki = "/dev/" + (string)after.Content;
-            tmpOption += $"-f -r{BadRead.Text} ";
-            if (image.IsChecked == true)
+            if (listview.SelectedItems.Count == 0)
             {
-                saki = imagePath;
-                tmpOption += $"{moto} {saki}";
-                ddrescueRun(tmpOption);
-                tmpOption = "";
+                System.Windows.MessageBox.Show("ドライブを選択してください", "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+
+                string moto = (string)before.Content;
+                string saki = (string)after.Content;
+                DateTime dateTime = DateTime.Now;
+                if ((string)run.Content == "実行")
+                {
+                    var first = System.Windows.MessageBox.Show("本当に実行しますか？", "警告", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                    var second = System.Windows.MessageBox.Show("本当の本当に実行しますか？", "警告", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                    if (first == MessageBoxResult.OK && second == MessageBoxResult.OK)
+                    {
+                        string dir = Path.GetDirectoryName(imagePath);
+                        run.Content = "キャンセル";
+                        cancel = false;
+                        if (image.IsChecked == true)
+                        {
+                            saki = imagePath;
+                            tmpOption += $"-f -r{BadRead.Text} ";
+
+                            //log = $"{dir}\\{Path.GetFileName(imagePath)}.LOG";
+                            tmpOption += $"{moto} {saki}";
+                            ddrescueRun(tmpOption);
+                            tmpOption = "";
+                            image.IsEnabled = false;
+                            DirectAccess.IsEnabled = false;
+                            ReadErrorIgnore.IsEnabled = false;
+                            kuwashiku.IsEnabled = false;
+                        }
+                        else
+                        {
+                            dir = Path.GetTempPath();
+                            tmpOption += $"-f -r{BadRead.Text} ";
+
+                            log = $"{dir}{Path.GetFileName(imagePath)}.LOG";
+                            tmpOption += $"{moto} {saki}";
+                            ddrescueRun(tmpOption);
+                            tmpOption = "";
+                            image.IsEnabled = false;
+                            DirectAccess.IsEnabled = false;
+                            ReadErrorIgnore.IsEnabled = false;
+                            kuwashiku.IsEnabled = false;
+                        }
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("キャンセルしました", "インフォメーション", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else
+                {
+                    run.Content = "実行";
+                    cancel = true;
+                    image.IsEnabled = true;
+                    DirectAccess.IsEnabled = true;
+                    ReadErrorIgnore.IsEnabled = true;
+                    kuwashiku.IsEnabled = true;
+                    System.Windows.MessageBox.Show("キャンセルしました", "インフォメーション", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
         }
 
+        private void forceLock()
+        {
+            this.IsEnabled = false;
+        }
         private void ReadErrorIgnore_Checked(object sender, RoutedEventArgs e)
         {
             tmpOption += "-n ";
@@ -258,6 +381,23 @@ namespace ddrescure_for_Windows
             image.IsChecked = false;
             imagePath = "";
             listview.SelectionMode = SelectionMode.Multiple;
+        }
+
+        private void kuwashiku_Checked(object sender, RoutedEventArgs e)
+        {
+            tmpOption += "-v ";
+        }
+
+        private void kuwashiku_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            cancel = true;
+            await Task.Delay(1000);
+            Environment.Exit(0);
         }
     }
 }
