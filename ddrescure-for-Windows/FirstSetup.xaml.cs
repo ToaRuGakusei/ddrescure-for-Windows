@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ddrescure_for_Windows
+namespace ddrescue_for_Windows
 {
     /// <summary>
     /// FirstSetup.xaml の相互作用ロジック
@@ -62,24 +62,23 @@ namespace ddrescure_for_Windows
                 using (StreamWriter sw = new StreamWriter(@".\CygwinPortable\App\Runtime\Cygwin\Setup.bat", false))
                 {
                     //wget https://raw.githubusercontent.com/ToaRuGakusei/apt-cyg_patch/main/apt-cyg & chmod 755 apt-cyg & mv apt-cyg /usr/local/bin/ & 
-                    sw.WriteLine("@echo off\r\nsetlocal enableextensions\r\nset TERM=\r\ncd /d \"%~dp0bin\" && .\\bash --login -i -c \"apt-cyg -m https://ftp.iij.ad.jp/pub/cygwin/x86_64/ update & apt-cyg install ddrescue & apt-cyg -m https://ftp.iij.ad.jp/pub/cygwin/x86_64/ update & apt-cyg install ddrescue\"");
+                    sw.WriteLine("@echo off\r\nsetlocal enableextensions\r\nset TERM=\r\ncd /d \"%~dp0bin\" && .\\bash --login -i -c \"mkdir ~/tmp & wget -nc -P ~/tmp https://raw.githubusercontent.com/ToaRuGakusei/apt-cyg_patch/main/apt-cyg & chmod 755 ~/tmp/apt-cyg & ~/tmp/apt-cyg -m https://ftp.iij.ad.jp/pub/cygwin/x86_64/ update & ~/tmp/apt-cyg install ddrescue\"");
                 }
                 await Task.Delay(1000);
                 ProcessStartInfo pi2 = new ProcessStartInfo()
                 {
                     FileName = @".\CygwinPortable\App\Runtime\Cygwin\Setup.bat",
-                    Arguments = "Hello",
-                    UseShellExecute = true,
+                    UseShellExecute = false,
                     
                 };
-                var res2 = Process.Start(pi2);
-                //Debug.WriteLine(res2.StandardOutput);
-                res2.WaitForExit();
-                Debug.WriteLine(res2.ExitCode);
-                var res3 = Process.Start(pi2);
-                //Debug.WriteLine(res2.StandardOutput);
-                res3.WaitForExit();
-                Debug.WriteLine(res3.ExitCode);
+                while(!File.Exists(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe"))
+                {
+                    var res2 = Process.Start(pi2);
+                    //Debug.WriteLine(res2.StandardOutput);
+                    res2.WaitForExit();
+                    Debug.WriteLine(res2.ExitCode);
+
+                }
                 MessageBox.Show("インストール完了");
                 this.Close();
 

@@ -1,13 +1,13 @@
-﻿<Window x:Class="ddrescure_for_Windows.FirstSetup"
+﻿<Window x:Class="ddrescue_for_Windows.FirstSetup"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ddrescure_for_Windows"
+        xmlns:local="clr-namespace:ddrescue_for_Windows"
         mc:Ignorable="d"
         Title="FirstSetup" Height="450" Width="800">
     <Grid>
-        <Label Content="ddrescure for Windows(Cygwin)" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="ddrescue for Windows(Cygwin)" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top"/>
         <Button Content="セットアップを開始する" HorizontalAlignment="Center" Margin="0,41,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 
     </Grid>
