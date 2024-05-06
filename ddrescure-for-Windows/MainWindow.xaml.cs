@@ -16,6 +16,8 @@ namespace ddrescue_for_Windows
         public MainWindow()
         {
             InitializeComponent();
+
+            //初回起動時にCygwin&ddrescueをセットアップ
             if (!File.Exists(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe"))
             {
                 FirstSetup firstSetup = new FirstSetup();
@@ -39,6 +41,7 @@ namespace ddrescue_for_Windows
                 si.RedirectStandardError = false;
                 si.RedirectStandardOutput = true;
                 si.UseShellExecute = false;
+
                 using (var proc = new Process())
                 using (var ctoken = new CancellationTokenSource())
                 {
@@ -73,20 +76,20 @@ namespace ddrescue_for_Windows
                                 }
                                 try
                                 {
-                                    infodisk += l + "\n";
+                                    infodisk += l + "\n"; //出力に改行を付加して格納
                                     string[] split = l.Split(" ");
                                     string[] splitResult = new string[10];
                                     int i = 0;
                                     foreach (string s in split)
                                     {
-                                        if (s != "")
+                                        if (s != "") //何か入っているとき実行
                                         {
                                             splitResult[i] = s;
                                             Debug.WriteLine(splitResult[i]);
                                             i++;
                                         }
                                     }
-                                    list.Add(new DiskInfo { major = splitResult[0], minor = splitResult[1], blocks = int.Parse(splitResult[2]), name = splitResult[3], winMounts = splitResult[4] });
+                                    list.Add(new DiskInfo { major = splitResult[0], minor = splitResult[1], blocks = int.Parse(splitResult[2]), name = splitResult[3], winMounts = splitResult[4] }); //listに追加
                                 }
                                 catch (Exception)
                                 {
@@ -106,7 +109,7 @@ namespace ddrescue_for_Windows
 
             return list;
         }
-        private bool cancel = false;
+        private bool cancel = false; //キャンセルかどうか。
         private async void ddrescueRun(string option)
         {
             try
@@ -119,8 +122,7 @@ namespace ddrescue_for_Windows
                     si.RedirectStandardError = false;
                     si.RedirectStandardOutput = true;
                     si.UseShellExecute = false;
-                    string dir = Path.GetDirectoryName(imagePath);
-                    DateTime dateTime = DateTime.Now;
+
                     using (var proc = new Process())
                     using (var ctoken = new CancellationTokenSource())
                     {
@@ -141,7 +143,6 @@ namespace ddrescue_for_Windows
                         };
                         // プロセスの開始
                         proc.Start();
-                        int count = 0;
                         bool syokika = false;
                         Task.WaitAll(
                             Task.Run(async () =>
@@ -192,6 +193,8 @@ namespace ddrescue_for_Windows
                                             DirectAccess.IsEnabled = true;
                                             ReadErrorIgnore.IsEnabled = true;
                                             kuwashiku.IsEnabled = true;
+                                            Title = "Finished!!";
+                                            MessageBox.Show("終了しました!","インフォメーション",MessageBoxButton.OK,MessageBoxImage.Information);
                                         }));
                                     }
 

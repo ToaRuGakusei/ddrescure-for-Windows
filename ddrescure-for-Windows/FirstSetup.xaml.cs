@@ -58,7 +58,7 @@ namespace ddrescue_for_Windows
                 var res1 = Process.Start(pi1);
                 res1.WaitForExit();
                 Debug.WriteLine(res1.ExitCode);
-                MessageBox.Show($"Download Cygwin X64をクリックしてください。\nダウンロードが終わると管理者権限を求められるので、許可をしてください。\n自動的にインストールが開始します。\nインストールが終わったらこのダイアログのOKを押してください。");
+                MessageBox.Show($"Download Cygwin X64をクリックしてください。\nダウンロードが終わると管理者権限を求められるので、許可をしてください。\n自動的にインストールが開始します。\nインストールが終わったらこのダイアログのOKを押してください。\nレジストリが～っていうポップアップが英語で出た場合、Cancelをクリックしておいてください。");
                 using (StreamWriter sw = new StreamWriter(@".\CygwinPortable\App\Runtime\Cygwin\Setup.bat", false))
                 {
                     //wget https://raw.githubusercontent.com/ToaRuGakusei/apt-cyg_patch/main/apt-cyg & chmod 755 apt-cyg & mv apt-cyg /usr/local/bin/ & 
