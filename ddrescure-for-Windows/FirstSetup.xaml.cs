@@ -29,6 +29,8 @@ namespace ddrescue_for_Windows
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             FileDownloader fileDownloader = new FileDownloader();
+            down.Content = "ダウンロード中";
+
             var m = await fileDownloader.GetContent("https://github.com/MachinaCore/CygwinPortable/releases/download/1.4.0.0/CygwinPortable_1.4.0.0.paf.exe");
             try
             {
@@ -38,6 +40,7 @@ namespace ddrescue_for_Windows
                     m.WriteTo(fs);
                     m.Close();
                 }
+                down.Content = "ダウンロード終了";
                 MessageBox.Show("インストーラーが起動します。\n指示に従ってそのままインストールしてください。");
 
                 ProcessStartInfo pi = new ProcessStartInfo()
@@ -79,7 +82,6 @@ namespace ddrescue_for_Windows
                     Debug.WriteLine(res2.ExitCode);
 
                 }
-                MessageBox.Show("インストール完了");
                 this.Close();
 
             }
