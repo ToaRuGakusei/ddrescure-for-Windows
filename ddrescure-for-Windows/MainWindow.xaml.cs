@@ -153,33 +153,34 @@ namespace ddrescue_for_Windows
                                 {
                                     string l = proc.StandardOutput.ReadLine();
                                     buf.Add(l);
-                                    if(buf.Count == 8 && !syokika) //余計な部分を消す
+                                    if (buf.Count == 8 && !syokika) //余計な部分を消す
                                     {
                                         buf.Clear();
                                         syokika = true;
-                                    }else if(syokika)
+                                    }
+                                    else if (syokika)
                                     {
                                         if (buf.Count == 8)
                                         {
-                                                string t = "";
-                                                this.Dispatcher.Invoke((Action)(async () =>
+                                            string t = "";
+                                            this.Dispatcher.Invoke((Action)(async () =>
+                                            {
+                                                foreach (string s in buf)
                                                 {
-                                                    foreach (string s in buf)
-                                                    {
-                                                        t += s + "\n";
-                                                    }
-                                                    Prompt.Text = t; //プロンプトを表示
-                                                    Title = buf[0];
-                                                }));
-                                                buf.Clear();
-                                                t = ""; 
+                                                    t += s + "\n";
+                                                }
+                                                Prompt.Text = t; //プロンプトを表示
+                                                Title = buf[0];
+                                            }));
+                                            buf.Clear();
+                                            t = "";
                                         }
                                         else if (buf.Count >= 10) //10行追加されたらすべて消す。
                                         {
                                             buf.Clear();
                                         }
                                     }
-                                    
+
 
                                     Debug.WriteLine(l);
                                     count++;
@@ -194,7 +195,7 @@ namespace ddrescue_for_Windows
                                             ReadErrorIgnore.IsEnabled = true;
                                             kuwashiku.IsEnabled = true;
                                             Title = "Finished!!";
-                                            MessageBox.Show("終了しました!","インフォメーション",MessageBoxButton.OK,MessageBoxImage.Information);
+                                            MessageBox.Show("終了しました!", "インフォメーション", MessageBoxButton.OK, MessageBoxImage.Information);
                                         }));
                                     }
 
@@ -237,10 +238,10 @@ namespace ddrescue_for_Windows
                 }
                 else
                 {
-                    before.Content = "/dev/" + (listview.SelectedItems[0] as DiskInfo).name;
+                    before.Content = "/dev/" + (listview.SelectedItems[0] as DiskInfo).name + $"（）";
                     if (listview.SelectedItems.Count == 2)
                     {
-                        after.Content = "/dev/" + (listview.SelectedItems[1] as DiskInfo).name;
+                        after.Content = "/dev/" + (listview.SelectedItems[1] as DiskInfo).name + $"（）";
                     }
                 }
             }
@@ -308,7 +309,7 @@ namespace ddrescue_for_Windows
                 if ((string)run.Content == "実行")
                 {
                     var first = System.Windows.MessageBox.Show("本当に実行しますか？", "警告", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                    if(first != MessageBoxResult.Cancel)
+                    if (first != MessageBoxResult.Cancel)
                     {
                         var second = System.Windows.MessageBox.Show("本当の本当に実行しますか？", "警告", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                         if (first == MessageBoxResult.OK && second == MessageBoxResult.OK)
