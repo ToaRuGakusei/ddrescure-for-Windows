@@ -145,7 +145,7 @@ namespace ddrescue_for_Windows
                         proc.Start();
                         bool syokika = false;
                         Task.WaitAll(
-                            Task.Run(async () =>
+                            Task.Run(() =>
                             {
                                 int count = 0;
                                 ObservableCollection<string> buf = new ObservableCollection<string>();
@@ -163,7 +163,7 @@ namespace ddrescue_for_Windows
                                         if (buf.Count == 8)
                                         {
                                             string t = "";
-                                            this.Dispatcher.Invoke((Action)(async () =>
+                                            this.Dispatcher.Invoke((Action)(() =>
                                             {
                                                 foreach (string s in buf)
                                                 {
@@ -186,7 +186,7 @@ namespace ddrescue_for_Windows
                                     count++;
                                     if (l.Contains("Finished"))
                                     {
-                                        this.Dispatcher.Invoke((Action)(async () =>
+                                        this.Dispatcher.Invoke((Action)(() =>
                                         {
                                             run.Content = "実行";
                                             cancel = true;
@@ -238,10 +238,10 @@ namespace ddrescue_for_Windows
                 }
                 else
                 {
-                    before.Content = "/dev/" + (listview.SelectedItems[0] as DiskInfo).name + $"（）";
+                    before.Content = "/dev/" + (listview.SelectedItems[0] as DiskInfo).name;
                     if (listview.SelectedItems.Count == 2)
                     {
-                        after.Content = "/dev/" + (listview.SelectedItems[1] as DiskInfo).name + $"（）";
+                        after.Content = "/dev/" + (listview.SelectedItems[1] as DiskInfo).name;
                     }
                 }
             }

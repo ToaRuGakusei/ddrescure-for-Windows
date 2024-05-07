@@ -4,10 +4,18 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>ddrescue_for_Windows</RootNamespace>
-    <Nullable>enable</Nullable>
+    <Nullable>annotations</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
