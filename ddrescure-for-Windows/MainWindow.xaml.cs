@@ -42,6 +42,7 @@ namespace ddrescue_for_Windows
                 si.RedirectStandardOutput = true;
                 si.UseShellExecute = false;
 
+                bool ok = false;
                 using (var proc = new Process())
                 using (var ctoken = new CancellationTokenSource())
                 {
@@ -82,12 +83,27 @@ namespace ddrescue_for_Windows
                                     int i = 0;
                                     foreach (string s in split)
                                     {
-                                        if (s != "") //何か入っているとき実行
+                                        //何か入っているとき実行
+                                        if ((s != "" && s.Contains("Copying non-tried blocks... Pass 1 (forwards)")) || ok)
                                         {
+                                            ok = true;
                                             splitResult[i] = s;
                                             Debug.WriteLine(splitResult[i]);
                                             i++;
                                         }
+                                        if(s.Contains("Finished"))
+                                        {
+                                            run.Content = "実行";
+                                            Title = "";
+                                            cancel = true;
+                                            image.IsEnabled = true;
+                                            DirectAccess.IsEnabled = true;
+                                            ReadErrorIgnore.IsEnabled = true;
+                                            kuwashiku.IsEnabled = true;
+                                            MessageBox.Show("終わり");
+                                            break;
+                                        }
+
                                     }
                                     list.Add(new DiskInfo { major = splitResult[0], minor = splitResult[1], blocks = int.Parse(splitResult[2]), name = splitResult[3], winMounts = splitResult[4] }); //listに追加
                                 }
