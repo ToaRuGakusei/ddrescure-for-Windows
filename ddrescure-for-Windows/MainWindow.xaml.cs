@@ -72,6 +72,10 @@ namespace ddrescue_for_Windows
                                 if (l == null)
                                 {
                                     Debug.WriteLine(infodisk);
+                                    this.Dispatcher.Invoke((Action)(() =>
+                                    {
+                                        Prompt.Text = infodisk;
+                                    }));
                                     break;
                                 }
                                 try
