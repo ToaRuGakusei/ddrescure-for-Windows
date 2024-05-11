@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
 namespace ddrescue_for_Windows
 {
     /// <summary>
@@ -25,13 +12,29 @@ namespace ddrescue_for_Windows
         {
             InitializeComponent();
         }
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private bool isEnd = false;
+        private void Notouch()
         {
-            FileDownloader fileDownloader = new FileDownloader();
-            down.Content = "ダウンロード中";
-
-            var m = await fileDownloader.GetContent("https://github.com/MachinaCore/CygwinPortable/releases/download/1.4.0.0/CygwinPortable_1.4.0.0.paf.exe");
+            this.IsEnabled = false; //MainWindowの画面を無効化
+            isEnd = false;
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (isEnd)
+                    {
+                        this.Dispatcher.Invoke((Action)(() =>
+                        {
+                            this.IsEnabled = true;
+                        }));
+                        break;
+                    }
+                }
+            });
+        }
+        private async System.Threading.Tasks.Task cygwin(FileDownloader fld)
+        {
+            var m = await fld.GetContent("https://github.com/MachinaCore/CygwinPortable/releases/download/1.4.0.0/CygwinPortable_1.4.0.0.paf.exe");
             try
             {
                 using (FileStream fs = new FileStream(@".\Cygwin.exe", FileMode.Create))
@@ -40,7 +43,24 @@ namespace ddrescue_for_Windows
                     m.WriteTo(fs);
                     m.Close();
                 }
-                down.Content = "ダウンロード終了";
+                isEnd = true;
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileDownloader fileDownloader = new FileDownloader();
+                DownloadNow dln = new DownloadNow();
+                Notouch();
+                dln.Show();
+                await cygwin(fileDownloader);
+                dln.Close();
                 MessageBox.Show("インストーラーが起動します。\n指示に従ってそのままインストールしてください。");
 
                 ProcessStartInfo pi = new ProcessStartInfo()
@@ -72,9 +92,9 @@ namespace ddrescue_for_Windows
                 {
                     FileName = @".\CygwinPortable\App\Runtime\Cygwin\Setup.bat",
                     UseShellExecute = false,
-                    
+
                 };
-                while(!File.Exists(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe"))
+                while (!File.Exists(@".\CygwinPortable\App\Runtime\Cygwin\bin\ddrescue.exe"))
                 {
                     var res2 = Process.Start(pi2);
                     //Debug.WriteLine(res2.StandardOutput);

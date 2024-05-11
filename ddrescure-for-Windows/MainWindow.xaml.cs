@@ -159,8 +159,9 @@ namespace ddrescue_for_Windows
                                     buf.Add(l);
                                     if (buf.Count == 8 && !syokika) //余計な部分を消す
                                     {
+                                        if (buf[0].Contains("Copying non-tried blocks... Pass 1 (forwards)"))
+                                            syokika = true;
                                         buf.Clear();
-                                        syokika = true;
                                     }
                                     else if (syokika)
                                     {
@@ -203,7 +204,7 @@ namespace ddrescue_for_Windows
                                         }));
                                     }
 
-                                    if (l == null || cancel == true)
+                                    if (cancel == true)
                                     {
                                         proc.Kill();
                                         cancel = false;

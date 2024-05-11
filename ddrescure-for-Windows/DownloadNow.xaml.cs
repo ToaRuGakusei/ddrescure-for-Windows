@@ -75,7 +75,7 @@ namespace ddrescue_for_Windows
                                                         name = FileDownloader.WhatName;
                                                         end = FileDownloader.IsEnd;
                                                     }));
-                                                    if (name.Contains("ffmpeg") && end == true)
+                                                    if (name.Contains("cygwin") && end == true)
                                                     {
                                                         break;
                                                     }
