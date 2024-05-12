@@ -114,8 +114,11 @@ namespace ddrescue_for_Windows
             return list;
         }
         private bool cancel = false; //キャンセルかどうか。
+        private CancellationTokenSource tokenSource = new CancellationTokenSource();
         private async void ddrescueRun(string option)
         {
+            CancellationToken token = tokenSource.Token;
+
             try
             {
                 await Task.Run(() =>
@@ -149,9 +152,10 @@ namespace ddrescue_for_Windows
                         proc.Start();
                         bool syokika = false;
                         Task.WaitAll(
-                            Task.Run(() =>
+                            Task.Run(async() =>
                             {
                                 int count = 0;
+                                Random random = new Random();
                                 ObservableCollection<string> buf = new ObservableCollection<string>();
                                 while (true)
                                 {
@@ -159,9 +163,9 @@ namespace ddrescue_for_Windows
                                     buf.Add(l);
                                     if (buf.Count == 8 && !syokika) //余計な部分を消す
                                     {
-                                        if (buf[0].Contains("Copying non-tried blocks... Pass 1 (forwards)"))
+                                        if (buf[0].Contains("Copying non-tried blocks... Pass 1 (forwards)") || buf[1].Contains("Copying non-tried blocks... Pass 1 (forwards)"))
                                             syokika = true;
-                                        buf.Clear();
+                                        buf.RemoveAt(0);
                                     }
                                     else if (syokika)
                                     {
@@ -175,7 +179,10 @@ namespace ddrescue_for_Windows
                                                     t += s + "\n";
                                                 }
                                                 Prompt.Text = t; //プロンプトを表示
-                                                Title = buf[0];
+                                                if (buf[0] != "")
+                                                    Title = buf[0];
+                                                else
+                                                    Title = buf[1];
                                             }));
                                             buf.Clear();
                                             t = "";
@@ -328,13 +335,7 @@ namespace ddrescue_for_Windows
                                 tmpOption += $"-f -r{BadRead.Text} ";
 
                                 //log = $"{dir}\\{Path.GetFileName(imagePath)}.LOG";
-                                tmpOption += $"{moto} {saki}";
-                                ddrescueRun(tmpOption);
-                                tmpOption = "";
-                                image.IsEnabled = false;
-                                DirectAccess.IsEnabled = false;
-                                ReadErrorIgnore.IsEnabled = false;
-                                kuwashiku.IsEnabled = false;
+                                tmpOption += $"{moto} {saki} {LOG}";
                             }
                             else
                             {
@@ -342,14 +343,16 @@ namespace ddrescue_for_Windows
                                 tmpOption += $"-f -r{BadRead.Text} ";
 
                                 log = $"{dir}{Path.GetFileName(imagePath)}.LOG";
-                                tmpOption += $"{moto} {saki}";
-                                ddrescueRun(tmpOption);
-                                tmpOption = "";
-                                image.IsEnabled = false;
-                                DirectAccess.IsEnabled = false;
-                                ReadErrorIgnore.IsEnabled = false;
-                                kuwashiku.IsEnabled = false;
+                                tmpOption += $"{moto} {saki} {LOG}";
+
                             }
+                            ddrescueRun(tmpOption);
+                            tmpOption = "";
+                            image.IsEnabled = false;
+                            DirectAccess.IsEnabled = false;
+                            ReadErrorIgnore.IsEnabled = false;
+                            kuwashiku.IsEnabled = false;
+                            OnLog.IsEnabled = false;
                         }
                         else
                         {
@@ -367,10 +370,12 @@ namespace ddrescue_for_Windows
                     run.Content = "実行";
                     Title = "";
                     cancel = true;
+                    tokenSource.Cancel();
                     image.IsEnabled = true;
                     DirectAccess.IsEnabled = true;
                     ReadErrorIgnore.IsEnabled = true;
                     kuwashiku.IsEnabled = true;
+                    OnLog.IsEnabled = true;
                     System.Windows.MessageBox.Show("キャンセルしました", "インフォメーション", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
@@ -412,6 +417,36 @@ namespace ddrescue_for_Windows
             cancel = true;
             await Task.Delay(1000);
             Environment.Exit(0);
+        }
+        private string LOG = "";
+        private void log_Checked(object sender, RoutedEventArgs e)
+        {
+            if (LOG == "")
+            {
+                var dlg = new CommonSaveFileDialog();
+                dlg.DefaultFileName = "";
+                dlg.Filters.Add(new CommonFileDialogFilter("log", "*.log"));
+                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    LOG = dlg.FileName;
+                }
+                else
+                {
+                    OnLog.IsChecked = false;
+                    LOG = "";
+                }
+            }
+        }
+
+        private void log_Unchecked(object sender, RoutedEventArgs e)
+        {
+            OnLog.IsChecked = false;
+            LOG = "";
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
