@@ -16,7 +16,7 @@
     <Grid>
         <Menu Height="23" VerticalAlignment="Top" >
             <MenuItem Header="ファイル" Height="22" Width="54" Click="MenuItem_Click">
-                
+                <MenuItem Click="Window_Unloaded" Header="終了"></MenuItem>
             </MenuItem>
         </Menu>
         <Grid Margin="0,23,0,0">

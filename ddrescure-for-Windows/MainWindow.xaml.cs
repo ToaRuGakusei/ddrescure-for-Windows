@@ -412,10 +412,9 @@ namespace ddrescue_for_Windows
 
         }
 
-        private async void Window_Unloaded(object sender, RoutedEventArgs e)
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             cancel = true;
-            await Task.Delay(1000);
             Environment.Exit(0);
         }
         private string LOG = "";
