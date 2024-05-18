@@ -28,8 +28,8 @@ ddrescue for Windowsは、Windows上でddrescueをGUIで操作をできるよう
 
 ## よくある質問 (FAQ)
 ### 質問1
-回答1
-
+Q.セットアップが終わった後、「Open Folder in Bash」や「Open Folder in Cygwin」が追加されてるけどナニコレ？
+A.Cygwinをインストールした影響です。現在、これを表示させない対策方法を模索中です。
 ### 質問2
 回答2
 
