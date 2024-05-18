@@ -423,7 +423,7 @@ namespace ddrescue_for_Windows
             if (LOG == "")
             {
                 var dlg = new CommonSaveFileDialog();
-                dlg.DefaultFileName = "";
+                dlg.DefaultFileName = "Backup.log";
                 dlg.Filters.Add(new CommonFileDialogFilter("log", "*.log"));
                 if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                 {
