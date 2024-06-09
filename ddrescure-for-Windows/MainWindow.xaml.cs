@@ -25,6 +25,7 @@ namespace ddrescue_for_Windows
             }
         }
         private string imagePath = "";
+        private readonly string APIKEY = "";
         private async Task<ObservableCollection<DiskInfo>> getPar()
         {
             string infodisk = "";
@@ -206,7 +207,14 @@ namespace ddrescue_for_Windows
                                             DirectAccess.IsEnabled = true;
                                             ReadErrorIgnore.IsEnabled = true;
                                             kuwashiku.IsEnabled = true;
+                                            OnLog.IsEnabled = true;
                                             Title = "Finished!!";
+
+                                            if (Line_Notify_IsChecked == true)
+                                            {
+                                                LineNotify lineNotify = new LineNotify();
+                                                lineNotify.PushMessage($"{APIKEY}", $"Finished\n{Prompt.Text}");
+                                            }
                                             MessageBox.Show("終了しました!", "インフォメーション", MessageBoxButton.OK, MessageBoxImage.Information);
                                         }));
                                     }
@@ -314,7 +322,6 @@ namespace ddrescue_for_Windows
             }
             else
             {
-
                 string moto = (string)before.Content;
                 string saki = (string)after.Content;
                 DateTime dateTime = DateTime.Now;
@@ -446,6 +453,22 @@ namespace ddrescue_for_Windows
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+        private bool Line_Notify_IsChecked = false;
+        private void Line_Checked(object sender, RoutedEventArgs e)
+        {
+            Line_Notify_IsChecked = true;
+        }
+
+        private void Line_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Line_Notify_IsChecked = false;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            LineNotify lineNotify = new LineNotify();
+            lineNotify.PushMessage("AxCz5bu7gitKWDiji2rWr6CVHSdV5k4feazDsKKwdRj", "y9");
         }
     }
 }

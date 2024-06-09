@@ -14,9 +14,13 @@
     Unloaded="Window_Unloaded"
     mc:Ignorable="d">
     <Grid>
-        <Menu Height="23" VerticalAlignment="Top" >
-            <MenuItem Header="ファイル" Height="22" Width="54" Click="MenuItem_Click">
-                <MenuItem Click="Window_Unloaded" Header="終了"></MenuItem>
+        <Menu Height="23" VerticalAlignment="Top">
+            <MenuItem
+                Width="54"
+                Height="22"
+                Click="MenuItem_Click"
+                Header="ファイル">
+                <MenuItem Click="Window_Unloaded" Header="終了" />
             </MenuItem>
         </Menu>
         <Grid Margin="0,23,0,0">
@@ -85,7 +89,7 @@
                 HorizontalAlignment="Left">
                 <Grid
                     Height="58"
-                    Margin="2,124,3,0"
+                    Margin="2,156,3,0"
                     VerticalAlignment="Top">
                     <Label
                         x:Name="after"
@@ -118,7 +122,7 @@
                 <Button
                     Name="run"
                     Height="75"
-                    Margin="10,201,11,0"
+                    Margin="10,233,11,0"
                     VerticalAlignment="Top"
                     Click="Button_Click"
                     Content="実行"
@@ -126,7 +130,7 @@
                     FontWeight="Bold" />
                 <GroupBox
                     Width="259"
-                    Height="119"
+                    Height="151"
                     Margin="0,0,312,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
@@ -166,11 +170,19 @@
                             Checked="log_Checked"
                             Content="ログを使用する"
                             Unchecked="log_Unchecked" />
+                        <CheckBox
+                            Name="Line"
+                            Margin="0,86,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Checked="Line_Checked"
+                            Content="終了時LINEに通知をする"
+                            Unchecked="Line_Unchecked" />
                     </Grid>
                 </GroupBox>
                 <GroupBox
                     Width="297"
-                    Height="119"
+                    Height="151"
                     Margin="274,0,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
@@ -196,6 +208,7 @@
                     </Grid>
 
                 </GroupBox>
+                <Button Content="Button" HorizontalAlignment="Left" Margin="171,346,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
 
             </Grid>
             <TextBox
